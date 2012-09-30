@@ -8,5 +8,9 @@
   },
   "repository": "",
   "author": "Niklas Närhinen <niklas@narhinen.net>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "coffee-script": "*",
+    "underscore": "*"
+  }
 }
