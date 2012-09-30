@@ -1,6 +1,7 @@
 _ = require 'underscore'
 async = require 'async'
 builtInValidators = require './validators'
+builtInSanitizers = require './sanitizers'
 
 class Validator
   _defaultOptions:
@@ -29,6 +30,7 @@ class Validator
   validate: (obj, callback) =>
     errors = {}
     validators = {}
+    sanitizers = {}
     validKeys = _.keys @_rules
     for key, value of obj
       ruleIndex = validKeys.indexOf(key)
@@ -37,8 +39,11 @@ class Validator
       else
         rule = @_rules[key]
         validator = rule.validator || @_getValidator(rule.type)
+        sanitizer = rule.sanitizer || @_getSanitizer(rule.type)
         validators[key] = (cb) =>
           validator(key, value, @_messages, cb)
+        sanitizers[key] = (cb) =>
+          sanitizer(value, cb)
     objKeys = _.keys obj
     for key, rule of @_rules
       if rule.required && objKeys.indexOf(key) == -1
@@ -47,13 +52,20 @@ class Validator
       return callback(err) if err
       for pr, msg of results
         errors[pr] = msg if msg
-      callback(undefined, _.keys(errors).length == 0, errors)
+      async.parallel sanitizers, (err, sanitizedObject) ->
+        return callback(err) if err
+        callback(undefined, _.keys(errors).length == 0, errors, sanitizedObject)
 
   _getValidator: (type) ->
     if type == 'string'
       return builtInValidators.string
     if type == 'number'
       return builtInValidators.number
+
+  _getSanitizer: (type) ->
+    if type == 'number'
+      return builtInSanitizers.numberSanitizer
+    return builtInSanitizers.toStringSanitizer
 
 exports.validator = (options) ->
   return new Validator(options)

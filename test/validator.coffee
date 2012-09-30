@@ -46,8 +46,9 @@ describe 'validator', () ->
     it 'should automatically convert strings as numbers', (done) ->
       validator = hygiene.validator().withNumber('age')
       obj = {age: "26"}
-      validator.validate obj, (err, result, resultDetails) ->
+      validator.validate obj, (err, result, resultDetails, sanitizedObject) ->
         throw err if err
         assert.equal(true, result)
+        assert.strictEqual(26, sanitizedObject.age)
         done()
 
