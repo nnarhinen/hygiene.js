@@ -14,18 +14,19 @@ class Validator
       type: 'number'
     return this
 
-  validate: (obj) =>
+  validate: (obj, callback) =>
     validKeys = _.keys @_rules
     for key, value of obj
       ruleIndex = validKeys.indexOf(key)
       if ruleIndex == -1 || !@_validateRule(validKeys[ruleIndex], value)
-        return false
+        return callback(undefined, false)
 
     objKeys = _.keys obj
     for key, rule of @_rules
       if objKeys.indexOf(key) == -1
-        return false
-    return true
+        return callback(undefined, false)
+    return callback(undefined, true)
+
   _validateRule: (property, value) ->
     rule = @_rules[property]
     ret = typeof value == rule.type
