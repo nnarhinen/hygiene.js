@@ -6,7 +6,7 @@ describe 'validator', () ->
     it 'should return true for empty sanitizer and empty object', (done) ->
       validator = hygiene.validator()
       validator.validate {}, (err, result, resultDetails) ->
-        assert.equal(true, result);
+        assert.equal(true, result)
         done()
     it 'should return false for empty sanitizer and non-empty object', (done) ->
       validator = hygiene.validator()
@@ -28,4 +28,18 @@ describe 'validator', () ->
       validator = hygiene.validator().withNumber('age')
       validator.validate {age: 26}, (err, result, resultDetails) ->
         assert.equal(true, result)
+        done()
+    it 'should return true on missing required=false property', (done) ->
+      validator = hygiene.validator().withString('name').withString('title', {required: false})
+      validator.validate {name: 'John Doe'}, (err, result, resultDetails) ->
+        throw err if err
+        assert.equal(true, result)
+        done()
+    it 'should show error messages', (done) ->
+      validator = hygiene.validator().withString('name').withNumber('age')
+      validator.validate {age: 'Not a number'}, (err, result, resultDetails) ->
+        throw err if err
+        assert.equal(false, result)
+        assert.equal("Property 'age' is of wrong type", resultDetails.age)
+        assert.equal("Property 'name' is missing", resultDetails.name)
         done()
