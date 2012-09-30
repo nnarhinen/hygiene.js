@@ -43,3 +43,11 @@ describe 'validator', () ->
         assert.equal("Property 'age' is of wrong type", resultDetails.age)
         assert.equal("Property 'name' is missing", resultDetails.name)
         done()
+    it 'should automatically convert strings as numbers', (done) ->
+      validator = hygiene.validator().withNumber('age')
+      obj = {age: "26"}
+      validator.validate obj, (err, result, resultDetails) ->
+        throw err if err
+        assert.equal(true, result)
+        done()
+

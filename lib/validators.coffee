@@ -4,6 +4,6 @@ exports.string = (property, value, messages, callback) ->
   return callback(undefined, null)
 
 exports.number = (property, value, messages, callback) ->
-  if typeof value != 'number'
+  if typeof value != 'number' && isNaN(value)
     return callback(undefined, messages.type(property))
   return callback(undefined, null)
