@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha"
   },
-  "repository": "",
+  "repository": "https://github.com/nnarhinen/hygiene.js.git",
   "author": "Niklas Närhinen <niklas@narhinen.net>",
   "license": "MIT",
   "dependencies": {
