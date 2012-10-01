@@ -1,6 +1,8 @@
 Hygiene.js - sanitize your input
 ================================
 
+[![Build Status](https://secure.travis-ci.org/nnarhinen/hygiene.js.png)](http://travis-ci.org/nnarhinen/hygiene.js)
+
 Asynchronous validator
 ----------------------
 Hygiene.js is written for NodeJS, so it's only natural for it to be asyncronous. The point of Hygiene.js validator is to validate user input objects. It's convenient when using web frameworks like express etc.
