@@ -51,4 +51,12 @@ describe 'validator', () ->
         assert.equal(true, result)
         assert.strictEqual(26, sanitizedObject.age)
         done()
+    it 'should return false on empty required strings', (done) ->
+      validator = hygiene.validator().withString('name')
+      obj = {name: ''}
+      validator.validate obj, (err, result, resultDetails, sanitizedObject) ->
+        throw err if err
+        assert.equal(false, result)
+        assert.equal("Property 'name' is missing", resultDetails.name)
+        done()
 
