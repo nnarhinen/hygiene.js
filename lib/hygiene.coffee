@@ -3,6 +3,13 @@ async = require 'async'
 builtInValidators = require './validators'
 builtInSanitizers = require './sanitizers'
 
+createValidator = (key, value, messages, validator) ->
+  return (cb) ->
+    validator(key, value, messages, cb)
+createSanitizer = (value, sanitizer) ->
+  return (cb) ->
+    sanitizer(value, cb)
+
 class Validator
   _defaultOptions:
     messages:
@@ -40,10 +47,8 @@ class Validator
         rule = @_rules[key]
         validator = rule.validator || @_getValidator(rule.type)
         sanitizer = rule.sanitizer || @_getSanitizer(rule.type)
-        validators[key] = (cb) =>
-          validator(key, value, @_messages, cb)
-        sanitizers[key] = (cb) =>
-          sanitizer(value, cb)
+        validators[key] = createValidator(key, value, @_messages, validator)
+        sanitizers[key] = createSanitizer(value, sanitizer)
     objKeys = _.keys obj
     for key, rule of @_rules
       if rule.required && objKeys.indexOf(key) == -1

@@ -36,12 +36,13 @@ describe 'validator', () ->
         assert.equal(true, result)
         done()
     it 'should show error messages', (done) ->
-      validator = hygiene.validator().withString('name').withNumber('age')
-      validator.validate {age: 'Not a number'}, (err, result, resultDetails) ->
+      validator = hygiene.validator().withString('name').withNumber('age').withString('title')
+      validator.validate {age: 'Not a number', title: 'Mr.'}, (err, result, resultDetails) ->
         throw err if err
         assert.equal(false, result)
         assert.equal("Property 'age' is of wrong type", resultDetails.age)
         assert.equal("Property 'name' is missing", resultDetails.name)
+        assert.strictEqual(undefined, resultDetails.title)
         done()
     it 'should automatically convert strings as numbers', (done) ->
       validator = hygiene.validator().withNumber('age')
@@ -59,4 +60,3 @@ describe 'validator', () ->
         assert.equal(false, result)
         assert.equal("Property 'name' is missing", resultDetails.name)
         done()
-
