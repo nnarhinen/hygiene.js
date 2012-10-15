@@ -60,3 +60,14 @@ describe 'validator', () ->
         assert.equal(false, result)
         assert.equal("Property 'name' is missing", resultDetails.name)
         done()
+
+    it 'should support custom validators', (done) ->
+      validator = hygiene.validator().with('property', {validator: (property, value, messages, callback) ->
+        return process.nextTick () ->
+          return callback(undefined, null)
+      })
+      validator {'property': 'foo'}, (err, result) ->
+        throw err if err
+        assert.equal(true, result)
+        done()
+

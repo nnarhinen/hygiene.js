@@ -14,7 +14,7 @@ Hygiene.js is written for NodeJS, so it's only natural for it to be asyncronous.
 
 var hygiene = require('hygiene');
 
-var userValidator = hygiene.validator
+var userValidator = hygiene.validator()
 	.withString('name')
 	.withNumber('age');
 	
@@ -35,7 +35,7 @@ NodeJS makes it easy to use document databases that support storing JSON objects
 
 var hygiene = require('hygiene');
 
-var userValidator = hygiene.validator
+var userValidator = hygiene.validator()
 	.withString('name')
 	.withNumber('age');
 	
@@ -46,6 +46,40 @@ userValidator({name: 'John Doe', age: '33'}, function(err, result, resultDetails
 
 ````
 
+Custom validators
+-----------------
 
+So, what about custom validators? Well, just pass it to hygiene. This is why it is so handy to be asynchronous 
+
+````javascript
+
+var h = require('hygiene'),
+    http = require('http');
+var val = h.validator().with('twitter', {validator: function(property, value, messages, callback) {
+  http.get('http://api.twitter.com/1/users/show.xml?screen_name=' + value, function(res) {
+    if (res.statusCode == 404) {
+      return callback(undefined, 'Twitter handle ' + value + ' not found');
+    }
+    if (res.statusCode >= 400) {
+      return callback(new Error('Request failed'), null);
+    }
+    return callback(undefined, null);
+  }).on('error', function(e) {
+    return callback(e, null);
+  });
+}});
+
+val({twitter: 'nnarhinen'}, function(err, result, resultDetails) {
+  if (err) throw err;
+  assert.equal(true, result);
+});
+
+val({twitter: 'nnarhinenshouldnotbefound'}, function(err, result, resultDetails) {
+  if (err) throw err;
+  assert.equal(false, result);
+  assert.deepEqual({twitter: 'Twitter handle nnarhinenshouldnotbefound not found'}, result.resultDetails);
+});
+
+````
 
 
