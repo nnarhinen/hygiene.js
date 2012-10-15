@@ -18,7 +18,7 @@ var userValidator = hygiene.validator
 	.withString('name')
 	.withNumber('age');
 	
-userValidator.validate({name: 'John Doe', age: 'Not a number'}, function(err, result, resultDetails) {
+userValidator({name: 'John Doe', age: 'Not a number'}, function(err, result, resultDetails) {
 	assert.equal(false, result);
 	assert.equal("Property 'age' is of wrong type", resultDetails.age);
 });
@@ -39,7 +39,7 @@ var userValidator = hygiene.validator
 	.withString('name')
 	.withNumber('age');
 	
-userValidator.validate({name: 'John Doe', age: '33'}, function(err, result, resultDetails, sanitizedObject) {
+userValidator({name: 'John Doe', age: '33'}, function(err, result, resultDetails, sanitizedObject) {
 	assert.equal(true, result);
 	assert.strictEqual(33, sanitizedObject.age);
 });
