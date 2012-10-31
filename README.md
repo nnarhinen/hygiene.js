@@ -55,7 +55,7 @@ So, what about custom validators? Well, just pass it to hygiene. This is why it 
 
 var h = require('hygiene'),
     http = require('http');
-var val = h.validator().with('twitter', {validator: function(property, value, messages, callback) {
+var val = h.validator().with('twitter', {validator: function(options, value, messages, callback) {
   http.get('http://api.twitter.com/1/users/show.xml?screen_name=' + value, function(res) {
     if (res.statusCode == 404) {
       return callback(undefined, 'Twitter handle ' + value + ' not found');
