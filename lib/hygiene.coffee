@@ -3,9 +3,9 @@ async = require 'async'
 builtInValidators = require './validators'
 builtInSanitizers = require './sanitizers'
 
-createValidator = (key, value, messages, validator) ->
+createValidator = (options, value, messages, validator) ->
   return (cb) ->
-    validator(key, value, messages, cb)
+    validator(options, value, messages, cb)
 createSanitizer = (value, sanitizer) ->
   return (cb) ->
     sanitizer(value, cb)
@@ -50,7 +50,7 @@ class Validator
         rule = @_rules[key]
         validator = rule.validator || @_getValidator(rule.type)
         sanitizer = rule.sanitizer || @_getSanitizer(rule.type)
-        validators[key] = createValidator(key, value, @_messages, validator)
+        validators[key] = createValidator(_.extend({property: key}, rule), value, @_messages, validator)
         sanitizers[key] = createSanitizer(value, sanitizer)
     objKeys = _.keys obj
     for key, rule of @_rules
