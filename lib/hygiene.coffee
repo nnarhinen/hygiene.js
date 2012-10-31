@@ -34,6 +34,9 @@ class Validator
   withNumber: (property, options) =>
     @with property, _.extend({type: 'number'}, options)
 
+  withStringList: (property, options) =>
+    @with property, _.extend({type: 'stringList'}, options)
+
   validate: (obj, callback) =>
     errors = {}
     validators = {}
@@ -66,10 +69,14 @@ class Validator
       return builtInValidators.string
     if type == 'number'
       return builtInValidators.number
+    if type == 'stringList'
+      return builtInValidators.stringList
 
   _getSanitizer: (type) ->
     if type == 'number'
       return builtInSanitizers.numberSanitizer
+    if type == 'stringList'
+      return builtInSanitizers.stringListSanitizer
     return builtInSanitizers.toStringSanitizer
 
 exports.validator = (options) ->

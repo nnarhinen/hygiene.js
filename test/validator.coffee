@@ -71,3 +71,13 @@ describe 'validator', () ->
         assert.equal(true, result)
         done()
 
+
+describe "StringListValidator", () ->
+  it "should validate comma separated list as string array", (done) ->
+    validator = hygiene.validator().withStringList("tags")
+    obj = {tags: "foo,bar,baz"}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal true, result
+      assert.deepEqual {tags: ["foo", "bar", "baz"]}, sanitizedObject
+      done()
