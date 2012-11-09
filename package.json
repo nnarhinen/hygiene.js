@@ -1,6 +1,6 @@
 {
   "name": "hygiene",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Hygiene.js - sanitize your input",
   "main": "lib/index.js",
   "scripts": {

@@ -16,3 +16,8 @@ exports.stringList = (options, value, messages, callback) ->
   if value.length == 0
     return callback(undefined, messages.required(options.property))
   return callback(undefined, null)
+
+exports.boolean = (options, value, messages, callback) ->
+  if typeof value != 'boolean' && value != 1 && value != 0
+    return callback(undefined, messages.type(options.property))
+  return callback(undefined, null)

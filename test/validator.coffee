@@ -87,3 +87,29 @@ describe "StringListValidator", () ->
       assert.equal true, result
       assert.deepEqual {tags: ["foo", "bar", "baz"]}, sanitizedObject
       done()
+
+describe "BooleanValidator", () ->
+  it "should validate booleans", (done) ->
+    validator = hygiene.validator().withBoolean("is_public")
+    obj = {is_public: true}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal true, result
+      done()
+  it "should check for type", (done) ->
+    validator = hygiene.validator().withBoolean("is_public")
+    obj = {is_public: "asdf"}
+    validator obj, (err, result, resultDetails) ->
+      throw err if err
+      assert.equal false, result
+      assert.equal "Property 'is_public' is of wrong type", resultDetails.is_public
+      done()
+  it "should automatically convert integer 1 or 0 as boolean", (done) ->
+    validator = hygiene.validator().withBoolean("is_public").withBoolean("is_active")
+    obj= {is_public: 1, is_active: 0}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal true, result
+      assert.strictEqual(true, sanitizedObject.is_public)
+      assert.strictEqual(false, sanitizedObject.is_active)
+      done()
