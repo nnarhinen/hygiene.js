@@ -27,7 +27,7 @@ class Validator
   with: (property, options) =>
     @_rules[property] = _.extend({required: true}, options)
     return this
-  
+
   withString: (property, options) =>
     @with property, _.extend({type: 'string'}, options)
 
@@ -45,6 +45,12 @@ class Validator
     validators = {}
     sanitizers = {}
     validKeys = _.keys @_rules
+    objKeys = _.keys obj
+    for key, rule of @_rules
+      if rule.required && objKeys.indexOf(key) == -1
+        errors[key] = @_messages.required(key)
+      else if objKeys.indexOf(key) == -1 && rule.hasOwnProperty('defaultValue')
+        obj[key] = rule.defaultValue
     for key, value of obj
       ruleIndex = validKeys.indexOf(key)
       if ruleIndex == -1
@@ -55,10 +61,6 @@ class Validator
         sanitizer = rule.sanitizer || @_getSanitizer(rule.type)
         validators[key] = createValidator(_.extend({property: key}, rule), value, @_messages, validator)
         sanitizers[key] = createSanitizer(value, sanitizer)
-    objKeys = _.keys obj
-    for key, rule of @_rules
-      if rule.required && objKeys.indexOf(key) == -1
-        errors[key] = @_messages.required(key)
     async.parallel validators, (err, results) ->
       return callback(err) if err
       for pr, msg of results

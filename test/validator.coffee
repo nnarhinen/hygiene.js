@@ -77,6 +77,14 @@ describe 'validator', () ->
         assert.equal(true, result)
         done()
 
+    it 'should set default values for missing properties', (done) ->
+      validator = hygiene.validator().withBoolean('is_active', {required: false, defaultValue: true})
+      validator {}, (err, result, validationErrors, sanitizedObject) ->
+        throw err if err
+        assert.equal(true, result)
+        assert.equal(true, sanitizedObject.is_active)
+        done()
+
 
 describe "StringListValidator", () ->
   it "should validate comma separated list as string array", (done) ->
