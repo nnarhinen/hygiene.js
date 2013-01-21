@@ -122,6 +122,32 @@ describe "StringArrayValidator", () ->
       assert.equal "Property 'tags' is of wrong type", resultDetails.tags
       done()
 
+describe "ObjectValidator", () ->
+  it "should validate objects with an embedded validator", (done) ->
+    innerValidator = hygiene.validator().withString("name")
+    validator = hygiene.validator().withObject("inner", innerValidator)
+    obj =
+      inner:
+        name: "Foo"
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal true, result
+      assert.deepEqual {inner: {name: "Foo"}}, sanitizedObject
+      done();
+
+  it "should fail when embedded validator fails", (done) ->
+    innerValidator = hygiene.validator().withString("name")
+    validator = hygiene.validator().withObject("inner", innerValidator)
+    obj =
+      inner:
+        name_foo: "Foo"
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal false, result
+      assert.equal "Property 'name' is missing", resultDetails.inner.name
+      done();
+
+
 describe "BooleanValidator", () ->
   it "should validate booleans", (done) ->
     validator = hygiene.validator().withBoolean("is_public")

@@ -43,6 +43,9 @@ class Validator
   withBoolean: (property, options) =>
     @with property, _.extend({type: 'boolean'}, options)
 
+  withObject: (property, innerValidator, options) =>
+    @with property, _.extend({type: 'object', innerValidator: innerValidator}, options)
+
   validate: (obj, callback) =>
     errors = {}
     validators = {}
@@ -61,7 +64,7 @@ class Validator
       else
         rule = @_rules[key]
         validator = rule.validator || @_getValidator(rule.type)
-        sanitizer = rule.sanitizer || @_getSanitizer(rule.type)
+        sanitizer = rule.sanitizer || if rule.type == "object" then @_buildValidatorProxy(rule.innerValidator) else @_getSanitizer(rule.type)
         validators[key] = createValidator(_.extend({property: key}, rule), value, @_messages, validator)
         sanitizers[key] = createSanitizer(value, sanitizer)
     async.parallel validators, (err, results) ->
@@ -83,6 +86,8 @@ class Validator
       return builtInValidators.boolean
     if type == 'stringArray'
       return builtInValidators.stringArray
+    if type == 'object'
+      return builtInValidators.object
 
   _getSanitizer: (type) ->
     if type == 'number'
@@ -94,6 +99,15 @@ class Validator
     if type == 'stringArray'
       return builtInSanitizers.stringArraySanitizer
     return builtInSanitizers.toStringSanitizer
+
+  _buildValidatorProxy: (validator) ->
+    (value, cb) ->
+      validator value, (err, result, omit, sanitizedObject) ->
+        return cb(err) if err
+        if result
+          return cb(null, sanitizedObject)
+        cb()
+
 
 exports.validator = (options) ->
   return new Validator(options)

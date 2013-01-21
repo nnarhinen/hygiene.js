@@ -30,3 +30,11 @@ exports.boolean = (options, value, messages, callback) ->
   if typeof value != 'boolean' && value != 1 && value != 0
     return callback(undefined, messages.type(options.property))
   return callback(undefined, null)
+
+exports.object = (options, value, messages, callback) ->
+  if typeof value != 'object'
+    return callback(null, messages.type(options.property))
+  options.innerValidator value, (err, result, errorDetails, sanitizedObject) =>
+    return callback(err) if err
+    return callback() if result
+    return callback(null, errorDetails)
