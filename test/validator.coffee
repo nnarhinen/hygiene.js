@@ -96,6 +96,32 @@ describe "StringListValidator", () ->
       assert.deepEqual {tags: ["foo", "bar", "baz"]}, sanitizedObject
       done()
 
+describe "StringArrayValidator", () ->
+  it "should validate arrays", (done) ->
+    validator = hygiene.validator().withStringArray("tags")
+    obj = {tags: ["foo", "bar", "baz"]}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal true, result
+      assert.deepEqual {tags: ["foo", "bar", "baz"]}, sanitizedObject
+      done()
+  it "should check for type", (done) ->
+    validator = hygiene.validator().withStringArray("tags")
+    obj = {tags: "foo"}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal false, result
+      assert.equal "Property 'tags' is of wrong type", resultDetails.tags
+      done()
+  it "should check for array items type", (done) ->
+    validator = hygiene.validator().withStringArray("tags")
+    obj = {tags: ["foo", 1, true]}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal false, result
+      assert.equal "Property 'tags' is of wrong type", resultDetails.tags
+      done()
+
 describe "BooleanValidator", () ->
   it "should validate booleans", (done) ->
     validator = hygiene.validator().withBoolean("is_public")

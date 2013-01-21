@@ -37,6 +37,9 @@ class Validator
   withStringList: (property, options) =>
     @with property, _.extend({type: 'stringList'}, options)
 
+  withStringArray: (property, options) =>
+    @with property, _.extend({type: 'stringArray'}, options)
+
   withBoolean: (property, options) =>
     @with property, _.extend({type: 'boolean'}, options)
 
@@ -78,6 +81,8 @@ class Validator
       return builtInValidators.stringList
     if type == 'boolean'
       return builtInValidators.boolean
+    if type == 'stringArray'
+      return builtInValidators.stringArray
 
   _getSanitizer: (type) ->
     if type == 'number'
@@ -86,6 +91,8 @@ class Validator
       return builtInSanitizers.booleanSanitizer
     if type == 'stringList'
       return builtInSanitizers.stringListSanitizer
+    if type == 'stringArray'
+      return builtInSanitizers.stringArraySanitizer
     return builtInSanitizers.toStringSanitizer
 
 exports.validator = (options) ->
