@@ -147,6 +147,29 @@ describe "ObjectValidator", () ->
       assert.equal "Property 'name' is missing", resultDetails.inner.name
       done();
 
+describe "ObjectArrayValidator", () ->
+  it "should validate an array of objects with an embedded validator", (done) ->
+    innerValidator = hygiene.validator().withString("name")
+    validator = hygiene.validator().withObjectArray("inners", innerValidator)
+    obj =
+      inners: [{name: "Foo"}]
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal true, result
+      assert.deepEqual {inners: [{name: "Foo"}]}, sanitizedObject
+      done();
+
+  it "should fail when embedded validator fails", (done) ->
+      innerValidator = hygiene.validator().withString("name")
+      validator = hygiene.validator().withObjectArray("inners", innerValidator)
+      obj =
+        inners: [{name: 'Bar'}, {name_foo: "Foo"}]
+      validator obj, (err, result, resultDetails, sanitizedObject) ->
+        throw err if err
+        assert.equal false, result
+        assert.equal "Property 'name' is missing", resultDetails.inners[1].name
+        done();
+
 
 describe "BooleanValidator", () ->
   it "should validate booleans", (done) ->

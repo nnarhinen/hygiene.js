@@ -46,6 +46,9 @@ class Validator
   withObject: (property, innerValidator, options) =>
     @with property, _.extend({type: 'object', innerValidator: innerValidator}, options)
 
+  withObjectArray: (property, innerValidator, options) =>
+    @with property, _.extend({type: 'objectArray', innerValidator: innerValidator}, options)
+
   validate: (obj, callback) =>
     errors = {}
     validators = {}
@@ -64,7 +67,14 @@ class Validator
       else
         rule = @_rules[key]
         validator = rule.validator || @_getValidator(rule.type)
-        sanitizer = rule.sanitizer || if rule.type == "object" then @_buildValidatorProxy(rule.innerValidator) else @_getSanitizer(rule.type)
+        if rule.sanitizer
+          sanitizer = rule.sanitizer
+        else if rule.type == "object"
+          sanitizer = @_buildValidatorProxyForObject(rule.innerValidator)
+        else if rule.type == "objectArray"
+          sanitizer = @_buildValidatorProxyForObjectArray(rule.innerValidator)
+        else
+          sanitizer = @_getSanitizer rule.type
         validators[key] = createValidator(_.extend({property: key}, rule), value, @_messages, validator)
         sanitizers[key] = createSanitizer(value, sanitizer)
     async.parallel validators, (err, results) ->
@@ -88,6 +98,8 @@ class Validator
       return builtInValidators.stringArray
     if type == 'object'
       return builtInValidators.object
+    if type == 'objectArray'
+      return builtInValidators.objectArray
 
   _getSanitizer: (type) ->
     if type == 'number'
@@ -100,13 +112,24 @@ class Validator
       return builtInSanitizers.stringArraySanitizer
     return builtInSanitizers.toStringSanitizer
 
-  _buildValidatorProxy: (validator) ->
+  _buildValidatorProxyForObject: (validator) ->
     (value, cb) ->
       validator value, (err, result, omit, sanitizedObject) ->
         return cb(err) if err
         if result
           return cb(null, sanitizedObject)
         cb()
+
+  _buildValidatorProxyForObjectArray: (validator) ->
+    (value, cb) ->
+      async.map(value, (val, callback) ->
+        validator val, (err, result, omit, sanitizedObject) ->
+          return callback(err) if err
+          if result
+            return callback null, sanitizedObject
+          callback()
+      , cb)
+
 
 
 exports.validator = (options) ->

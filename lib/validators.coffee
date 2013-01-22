@@ -1,3 +1,5 @@
+async = require 'async'
+
 exports.string = (options, value, messages, callback) ->
   if typeof value != 'string'
     return callback(undefined, messages.type(options.property))
@@ -38,3 +40,23 @@ exports.object = (options, value, messages, callback) ->
     return callback(err) if err
     return callback() if result
     return callback(null, errorDetails)
+
+exports.objectArray = (options, value, messages, callback) ->
+  if typeof value.forEach != 'function'
+    return callback(undefined, messages.type(options.property))
+  success = true
+  value.forEach (one) ->
+    success = success && typeof one == 'object'
+  return callback(null, messages.type(options.property)) unless success
+  async.map value, (one, cb) ->
+    options.innerValidator one, (err, result, errorDetails, sanitizedObject) ->
+      return cb(err) if err
+      return cb() if result
+      return cb(null, errorDetails)
+  , (err, results) ->
+    return callback err if err
+    success = true
+    results.forEach (one) ->
+      success = success && !one
+    return callback() if success
+    callback null, results
