@@ -56,11 +56,12 @@ class Validator
     validKeys = _.keys @_rules
     objKeys = _.keys obj
     for key, rule of @_rules
-      if rule.required && objKeys.indexOf(key) == -1
+      if rule.required && (objKeys.indexOf(key) == -1 || obj[key] == null)
         errors[key] = @_messages.required(key)
       else if objKeys.indexOf(key) == -1 && rule.hasOwnProperty('defaultValue')
         obj[key] = rule.defaultValue
     for key, value of obj
+      continue if errors[key] # already marked as failed
       ruleIndex = validKeys.indexOf(key)
       if ruleIndex == -1
         errors[key] = @_messages.unknown(key)

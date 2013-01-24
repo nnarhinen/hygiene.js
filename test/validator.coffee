@@ -19,6 +19,11 @@ describe 'validator', () ->
       validator {}, (err, result, resultDetails) ->
         assert.equal(false, result)
         done()
+    it 'should return false for required property null', (done) ->
+      validator = hygiene.validator().withString('name')
+      validator {name: null}, (err, result, resultDetails) ->
+        assert.equal(false, result)
+        done()
     it 'should return false on defined property with wrong type', (done) ->
       validator = hygiene.validator().withNumber('age')
       validator {age: 'Not a number'}, (err, result, resultdetails) ->
