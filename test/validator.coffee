@@ -46,6 +46,12 @@ describe 'validator', () ->
         throw err if err
         assert.equal(true, result)
         done()
+    it 'should return true on null values with required=false', (done) ->
+      validator = hygiene.validator().withString('name').withString('title', {required: false})
+      validator {name: 'John Doe', title: null}, (err, result, resultDetails) ->
+        throw err if err
+        assert.equal(true, result)
+        done()
     it 'should show error messages', (done) ->
       validator = hygiene.validator().withString('name').withNumber('age').withString('title')
       validator {age: 'Not a number', title: 'Mr.'}, (err, result, resultDetails) ->

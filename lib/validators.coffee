@@ -1,6 +1,8 @@
 async = require 'async'
 
 exports.string = (options, value, messages, callback) ->
+  if value == null
+    value = ''
   if typeof value != 'string'
     return callback(undefined, messages.type(options.property))
   if value.length == 0 && options.required

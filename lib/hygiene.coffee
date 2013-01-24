@@ -82,6 +82,8 @@ class Validator
       return callback(err) if err
       for pr, msg of results
         errors[pr] = msg if msg
+      if !_.isEmpty errors
+        return callback(null, false, errors)
       async.parallel sanitizers, (err, sanitizedObject) ->
         return callback(err) if err
         callback(undefined, _.keys(errors).length == 0, errors, sanitizedObject)

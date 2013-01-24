@@ -1,4 +1,5 @@
 exports.toStringSanitizer = (value, cb) ->
+  value = '' if value == null
   cb(undefined, value.toString())
 
 exports.numberSanitizer = (value, cb) ->
