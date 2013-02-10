@@ -40,6 +40,9 @@ class Validator
   withStringArray: (property, options) =>
     @with property, _.extend({type: 'stringArray'}, options)
 
+  withNumberArray: (property, options) =>
+    @with property, _.extend({type: 'numberArray'}, options)
+
   withBoolean: (property, options) =>
     @with property, _.extend({type: 'boolean'}, options)
 
@@ -99,6 +102,8 @@ class Validator
       return builtInValidators.boolean
     if type == 'stringArray'
       return builtInValidators.stringArray
+    if type == 'numberArray'
+      return builtInValidators.numberArray
     if type == 'object'
       return builtInValidators.object
     if type == 'objectArray'
@@ -113,6 +118,8 @@ class Validator
       return builtInSanitizers.stringListSanitizer
     if type == 'stringArray'
       return builtInSanitizers.stringArraySanitizer
+    if type == 'numberArray'
+      return builtInSanitizers.numberArraySanitizer
     return builtInSanitizers.toStringSanitizer
 
   _buildValidatorProxyForObject: (validator) ->

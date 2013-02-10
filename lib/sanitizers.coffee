@@ -11,5 +11,5 @@ exports.booleanSanitizer = (value, cb) ->
 exports.stringListSanitizer = (value, cb) ->
   cb(undefined, value.split(','))
 
-exports.stringArraySanitizer = (value, cb) ->
+exports.numberArraySanitizer = exports.stringArraySanitizer = (value, cb) ->
   cb(undefined, value)

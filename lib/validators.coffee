@@ -1,5 +1,14 @@
 async = require 'async'
 
+validateArray = (options, value, messages, callback, innerTypeValidator) ->
+  if typeof value.forEach != 'function'
+    return callback(undefined, messages.type(options.property))
+  success = true
+  value.forEach (one) ->
+    success = success && innerTypeValidator one
+  return callback(null, messages.type(options.property)) unless success
+  return callback()
+
 exports.string = (options, value, messages, callback) ->
   if value == null
     value = ''
@@ -22,13 +31,10 @@ exports.stringList = (options, value, messages, callback) ->
   return callback(undefined, null)
 
 exports.stringArray = (options, value, messages, callback) ->
-  if typeof value.forEach != 'function'
-    return callback(undefined, messages.type(options.property))
-  success = true
-  value.forEach (one) ->
-    success = success && typeof one == 'string'
-  return callback(null, messages.type(options.property)) unless success
-  return callback()
+  return validateArray options, value, messages, callback, (one) -> typeof one == 'string'
+
+exports.numberArray = (options, value, messages, callback) ->
+  return validateArray options, value, messages, callback, (one) -> typeof one == 'number' && !isNaN one
 
 exports.boolean = (options, value, messages, callback) ->
   if typeof value != 'boolean' && value != 1 && value != 0
