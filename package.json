@@ -12,6 +12,7 @@
   "dependencies": {
     "coffee-script": "*",
     "underscore": "*",
-    "async": "*"
+    "async": "*",
+    "q": "*"
   }
 }

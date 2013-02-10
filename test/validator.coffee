@@ -96,6 +96,14 @@ describe 'validator', () ->
         assert.equal(true, sanitizedObject.is_active)
         done()
 
+    it 'should return a promise', (done) ->
+      validator = hygiene.validator().withNumber('age')
+      obj = {age: "26"}
+      validator(obj).spread (valid, validationErrors, sanitizedObject) ->
+        assert.equal true, valid
+        assert.deepEqual {age: 26}, sanitizedObject
+        done()
+
 
 describe "StringListValidator", () ->
   it "should validate comma separated list as string array", (done) ->
