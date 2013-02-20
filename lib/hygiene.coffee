@@ -6,9 +6,9 @@ builtInSanitizers = require './sanitizers'
 createValidator = (options, value, messages, validator) ->
   return (cb) ->
     validator(options, value, messages, cb)
-createSanitizer = (value, sanitizer) ->
+createSanitizer = (value, options, sanitizer) ->
   return (cb) ->
-    sanitizer(value, cb)
+    sanitizer(value, options, cb)
 
 class Validator
   _defaultOptions:
@@ -52,6 +52,9 @@ class Validator
   withObjectArray: (property, innerValidator, options) =>
     @with property, _.extend({type: 'objectArray', innerValidator: innerValidator}, options)
 
+  withDateTime: (property, options) =>
+    @with property, _.extend({type: 'datetime'}, options)
+
   validate: (obj, callback) =>
     errors = {}
     validators = {}
@@ -80,7 +83,7 @@ class Validator
         else
           sanitizer = @_getSanitizer rule.type
         validators[key] = createValidator(_.extend({property: key}, rule), value, @_messages, validator)
-        sanitizers[key] = createSanitizer(value, sanitizer)
+        sanitizers[key] = createSanitizer(value, rule, sanitizer)
     async.parallel validators, (err, results) ->
       return callback(err) if err
       for pr, msg of results
@@ -108,6 +111,8 @@ class Validator
       return builtInValidators.object
     if type == 'objectArray'
       return builtInValidators.objectArray
+    if type == 'datetime'
+      return builtInValidators.dateTime
 
   _getSanitizer: (type) ->
     if type == 'number'
@@ -120,10 +125,12 @@ class Validator
       return builtInSanitizers.stringArraySanitizer
     if type == 'numberArray'
       return builtInSanitizers.numberArraySanitizer
+    if type == 'datetime'
+      return builtInSanitizers.dateTimeSanitizer
     return builtInSanitizers.toStringSanitizer
 
   _buildValidatorProxyForObject: (validator) ->
-    (value, cb) ->
+    (value, options, cb) ->
       validator value, (err, result, omit, sanitizedObject) ->
         return cb(err) if err
         if result
@@ -131,7 +138,7 @@ class Validator
         cb()
 
   _buildValidatorProxyForObjectArray: (validator) ->
-    (value, cb) ->
+    (value, options, cb) ->
       async.map(value, (val, callback) ->
         validator val, (err, result, omit, sanitizedObject) ->
           return callback(err) if err

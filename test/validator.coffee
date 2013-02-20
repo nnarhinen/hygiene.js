@@ -241,3 +241,34 @@ describe "BooleanValidator", () ->
       assert.strictEqual(true, sanitizedObject.is_public)
       assert.strictEqual(false, sanitizedObject.is_active)
       done()
+
+describe "DateTimeValidator", () ->
+  it "should validate iso date times", (done) ->
+    validator = hygiene.validator().withDateTime("date")
+    obj = {date: "2007-11-20T22:19:17+02:00"}
+    validator obj, (err, result, resultDetails) ->
+      throw err if err
+      assert.equal true, result
+      done()
+  it "should return false for non date strings", (done) ->
+    validator = hygiene.validator().withDateTime("date")
+    obj = {date: "asdf"}
+    validator obj, (err, result, resultDetails) ->
+      throw err if err
+      assert.equal false, result
+      assert.equal "Property 'date' is of wrong type", resultDetails.date
+      done()
+  it "should export a Date object", (done) ->
+    validator = hygiene.validator().withDateTime("date")
+    obj = {date: "2007-11-20T22:19:17+02:00"}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal 2007, sanitizedObject.date.getFullYear()
+      done()
+  it "should format string when requested", (done) ->
+    validator = hygiene.validator().withDateTime("date", {exportFormat: "yyyy-MM-dd"})
+    obj = {date: "2007-11-20T22:19:17+02:00"}
+    validator obj, (err, result, resultDetails, sanitizedObject) ->
+      throw err if err
+      assert.equal "2007-11-20", sanitizedObject.date
+      done()

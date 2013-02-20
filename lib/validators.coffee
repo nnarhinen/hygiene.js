@@ -1,4 +1,5 @@
 async = require 'async'
+XDate = require 'xdate'
 
 validateArray = (options, value, messages, callback, innerTypeValidator) ->
   if typeof value.forEach != 'function'
@@ -68,3 +69,10 @@ exports.objectArray = (options, value, messages, callback) ->
       success = success && !one
     return callback() if success
     callback null, results
+
+exports.dateTime = (options, value, messages, callback) ->
+  date = new XDate value
+  if !date.valid()
+    return callback(undefined, messages.type(options.property))
+  callback()
+

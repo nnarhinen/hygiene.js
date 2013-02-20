@@ -1,6 +1,6 @@
 {
   "name": "hygiene",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Hygiene.js - sanitize your input",
   "main": "lib/index.js",
   "scripts": {
@@ -13,6 +13,7 @@
     "coffee-script": "*",
     "underscore": "*",
     "async": "*",
-    "q": "*"
+    "q": "*",
+    "xdate": "*"
   }
 }
