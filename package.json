@@ -10,10 +10,10 @@
   "author": "Niklas Närhinen <niklas@narhinen.net>",
   "license": "MIT",
   "dependencies": {
-    "coffee-script": "*",
-    "underscore": "*",
-    "async": "*",
-    "q": "*",
-    "xdate": "*"
+    "coffee-script": "1.3.3",
+    "underscore": "1.4.0",
+    "async": "0.1.22",
+    "q": "0.8.12",
+    "xdate": "0.7.0"
   }
 }
