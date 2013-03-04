@@ -74,16 +74,17 @@ class Validator
       else
         rule = @_rules[key]
         validator = rule.validator || @_getValidator(rule.type)
-        if rule.sanitizer
-          sanitizer = rule.sanitizer
-        else if rule.type == "object"
-          sanitizer = @_buildValidatorProxyForObject(rule.innerValidator)
-        else if rule.type == "objectArray"
-          sanitizer = @_buildValidatorProxyForObjectArray(rule.innerValidator)
-        else
-          sanitizer = @_getSanitizer rule.type
         validators[key] = createValidator(_.extend({property: key}, rule), value, @_messages, validator)
-        sanitizers[key] = createSanitizer(value, rule, sanitizer)
+        unless rule.ignore
+          if rule.sanitizer
+            sanitizer = rule.sanitizer
+          else if rule.type == "object"
+            sanitizer = @_buildValidatorProxyForObject(rule.innerValidator)
+          else if rule.type == "objectArray"
+            sanitizer = @_buildValidatorProxyForObjectArray(rule.innerValidator)
+          else
+            sanitizer = @_getSanitizer rule.type
+          sanitizers[key] = createSanitizer(value, rule, sanitizer)
     async.parallel validators, (err, results) ->
       return callback(err) if err
       for pr, msg of results

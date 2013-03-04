@@ -104,6 +104,15 @@ describe 'validator', () ->
         assert.deepEqual {age: 26}, sanitizedObject
         done()
 
+    it 'should discard property from sanitized object with ignore: true', (done) ->
+      validator = hygiene.validator().withNumber('age').withNumber('id', {ignore: true})
+      obj = {age: 26, id: 123}
+      validator(obj).spread((valid, validationErrors, sanitizedObject) ->
+        assert.equal true, valid
+        assert.deepEqual {age: 26}, sanitizedObject
+        done()
+      ).fail(done)
+
 
 describe "StringListValidator", () ->
   it "should validate comma separated list as string array", (done) ->
